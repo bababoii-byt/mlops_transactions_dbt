@@ -1,0 +1,71 @@
+﻿version: 2
+
+models:
+  - name: stg_transactions
+    description: "чищенные и нормализованные транзакции; базовый слой для аналитических витрин."
+    columns:
+      - name: transaction_time
+        description: "ата и время проведения транзакции."
+        tests:
+          - not_null
+      - name: transaction_date
+        description: "алендарная дата транзакции."
+        tests:
+          - not_null
+      - name: amount
+        description: "Сумма транзакции."
+        tests:
+          - not_null
+      - name: is_fraud
+        description: "елевой признак: 1 — мошенническая транзакция, 0 — обычная."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+
+unit_tests:
+  - name: test_stg_transactions_normalizes_fields
+    description: "роверяет нормализацию имени клиента, признака фрода и сегментацию суммы."
+    model: stg_transactions
+    given:
+      - input: source('raw', 'transactions')
+        rows:
+          - transaction_time: "2026-01-05 13:45:00"
+            merch: "merchant_1"
+            cat_id: "cat_1"
+            amount: 50.0
+            name_1: "Alice"
+            name_2: "Smith"
+            gender: "F"
+            us_state: "CA"
+            lat: 34.05
+            lon: -118.24
+            merchant_lat: 34.06
+            merchant_lon: -118.25
+            target: 0
+          - transaction_time: "2026-01-05 14:30:00"
+            merch: "merchant_2"
+            cat_id: "cat_2"
+            amount: 250.0
+            name_1: "Bob"
+            name_2: "Jones"
+            gender: "M"
+            us_state: "NY"
+            lat: 40.71
+            lon: -74.00
+            merchant_lat: 40.72
+            merchant_lon: -73.99
+            target: 1
+    expect:
+      rows:
+        - amount_bucket: "SMALL"
+          customer_name: "Alice Smith"
+          is_fraud: 0
+          transaction_hour: 13
+          day_of_week: 1
+        - amount_bucket: "MEDIUM"
+          customer_name: "Bob Jones"
+          is_fraud: 1
+          transaction_hour: 14
+          day_of_week: 1

@@ -1,0 +1,77 @@
+﻿version: 2
+
+models:
+  - name: mart_fraud_by_category
+    description: "Метрики мошенничества и денежных объёмов по категориям."
+    columns:
+      - name: cat_id
+        description: "Категория транзакции."
+        tests:
+          - not_null
+          - unique
+
+      - name: fraud_rate
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              arguments:
+                min_value: 0
+                max_value: 100
+
+  - name: mart_fraud_by_state
+    description: "Метрики транзакций и мошенничества по штатам."
+    columns:
+      - name: us_state
+        tests:
+          - not_null
+          - unique
+      - name: fraud_rate
+        tests:
+          - not_null
+
+  - name: mart_daily_state_metrics
+    description: "Дневные метрики транзакций по штатам."
+    columns:
+      - name: transaction_date
+        tests:
+          - not_null
+      - name: us_state
+        tests:
+          - not_null
+      - name: transaction_count
+        tests:
+          - not_null
+
+  - name: mart_customer_risk_profile
+    description: "История активности и сегмент риска клиента."
+    columns:
+      - name: customer_name
+        tests:
+          - not_null
+          - unique
+      - name: risk_segment
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['HIGH', 'MEDIUM', 'LOW']
+
+  - name: mart_hourly_fraud_pattern
+    description: "Риск мошенничества в разрезе дня недели и часа."
+    columns:
+      - name: day_of_week
+        tests:
+          - not_null
+      - name: transaction_hour
+        tests:
+          - not_null
+      - name: fraud_rate
+        tests:
+          - not_null
+
+  - name: mart_merchant_analytics
+    description: "Оборот и показатели подозрительности продавцов."
+    columns:
+      - name: merch
+        tests:
+          - not_null
+          - unique

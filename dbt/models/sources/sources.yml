@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: transactions_db
+    description: "Сырые транзакции, загруженные из исходного CSV в ClickHouse."
+    tables:
+      - name: transactions
+        description: "Одна строка — одна транзакция с целевым признаком фрода."

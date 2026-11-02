@@ -1,0 +1,18 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-merge-conflict
+
+  - repo: local
+    hooks:
+      - id: sqlfluff
+        name: SQLFluff lint
+        entry: sqlfluff lint --config .sqlfluff
+        language: system
+        types: [sql]
+        files: ^dbt/(models|tests)/.*\.sql$
+        exclude: ^dbt/models/marts/mart_daily_state_metrics\.sql$

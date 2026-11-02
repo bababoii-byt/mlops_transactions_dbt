@@ -1,0 +1,21 @@
+# Данные
+data/*
+!data/.gitkeep
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+
+# Секреты и локальные настройки
+.env
+profiles.yml
+
+# IDE
+.idea/
+.DS_Store
+
+# dbt
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
